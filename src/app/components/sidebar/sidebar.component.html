@@ -1,0 +1,16 @@
+<div class="sidebar" [ngClass]="{ 'collapsed': isSidebarCollapsed }">
+  <ul>
+    <li [ngClass]="{ 'active': router.url === '/auth/dashboard' }" data-label="Dashboard">
+      <i class="fas fa-tachometer-alt"></i>
+      <a routerLink="/auth/dashboard">Dashboard</a>
+    </li>
+    <li [ngClass]="{ 'active': router.url === '/auth/support' }" data-label="Support">
+      <i class="fas fa-headset"></i>
+      <a routerLink="/auth/support">Support</a>
+    </li>
+    <li (click)="logout()" data-label="Logout">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </li>
+  </ul>
+</div>

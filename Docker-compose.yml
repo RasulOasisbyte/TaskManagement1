@@ -1,0 +1,10 @@
+version: '18'
+
+services:
+  angular-app:
+    image: task-management1:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"

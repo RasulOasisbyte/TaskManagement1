@@ -1,0 +1,23 @@
+<p-dialog header="Add Task" [(visible)]="display" [modal]="true" [closable]="false">
+  <form #addTaskForm="ngForm">
+    <div class="p-field">
+      <label for="taskTitle">Task Title</label>
+      <input pInputText id="taskTitle" [(ngModel)]="taskTitle" name="title" required />
+    </div>
+
+    <div class="p-field">
+      <label for="taskDescription">Description</label>
+      <textarea pInputTextarea id="taskDescription" [(ngModel)]="taskDescription" name="description"></textarea>
+    </div>
+
+    <div class="p-field-checkbox">
+      <p-checkbox id="isImportant" [(ngModel)]="isImportant" name="important" binary="true"></p-checkbox>
+      <label for="isImportant">Mark as Important</label>
+    </div>
+  </form>
+
+  <p-footer>
+    <button pButton type="button" label="Cancel" (click)="onCancel()"></button>
+    <button pButton type="button" label="Close" (click)="display = false"></button>
+  </p-footer>
+</p-dialog>

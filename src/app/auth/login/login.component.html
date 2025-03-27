@@ -1,0 +1,81 @@
+<div class="login-container">
+  <div class="login-form-wrapper">
+    <!-- Branding Section -->
+    <div class="branding">
+      <h1>Task Management</h1>
+      <p>By Rasul Ahmed Khan</p>
+    </div>
+
+    <!-- Login Form -->
+    <div class="tab-content">
+      <h2>Login to Your Account</h2>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()" autocomplete="off">
+        <div class="input-wrapper">
+          <span class="p-float-label">
+            <input
+              type="text"
+              pInputText
+              id="username"
+              formControlName="username"
+              autocomplete="off"
+            />
+            <label for="username">Username</label>
+          </span>
+          <small
+            *ngIf="f['username'].invalid && (f['username'].touched || submittedLogin)"
+            class="p-error"
+          >
+
+            Username is required.
+
+          </small>
+        </div>
+        <div class="input-wrapper">
+          <span class="p-float-label">
+            <input
+              type="password"
+              pInputText
+              id="password"
+              formControlName="password"
+              autocomplete="new-password"
+            />
+            <label for="password">Password</label>
+          </span>
+          <small
+            *ngIf="f['password'].invalid && (f['password'].touched || submittedLogin)"
+            class="p-error"
+          >
+            <span *ngIf="f['password'].errors?.['required']">Password is required.</span>
+            <span *ngIf="f['password'].errors?.['minlength']">Password must be at least 6 characters.</span>
+          </small>
+        </div>
+
+        <div class="form-options">
+          <div class="remember-me">
+            <p-checkbox
+              formControlName="rememberMe"
+              [binary]="true"
+              label="Remember me"
+              inputId="rememberMe"
+            ></p-checkbox>
+          </div>
+          <div class="forgot-password">
+            <a (click)="switchToForgotPassword($event)">Forgot password?</a>
+          </div>
+        </div>
+        <button
+          pButton
+          type="submit"
+          label="Sign In"
+          class="primary-button"
+          [ngClass]="{'loading': isLoading}"
+        ></button>
+      </form>
+
+      <div class="signup-link">
+        <p>Don't have an account? <a (click)="switchToSignUp($event)">Sign Up Free!</a></p>
+      </div>
+    </div>
+  </div>
+</div>

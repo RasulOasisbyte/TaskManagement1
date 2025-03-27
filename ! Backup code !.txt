@@ -1,0 +1,1397 @@
+
+HTML/.............................................................................................................................................................................................................................................
+
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <button class="toggle-sidebar" (click)="toggleSidebar()">☰</button>
+      <h1>Rasul Task Management Application</h1>
+    </div>
+    <div class="header-right">
+      <div class="user-profile">
+        <img class="user-avatar" src="https://via.placeholder.com/40" alt="User Avatar" />
+        <span>Rasul Ahmed Khan</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Sidebar -->
+    <div class="sidebar" [ngClass]="{ 'collapsed': isSidebarCollapsed }">
+      <ul>
+        <li [ngClass]="{ 'active': true }" data-label="Dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </li>
+
+
+        <li data-label="Calendar">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Calendar</span>
+        </li>
+        <li data-label="Support">
+          <i class="fas fa-life-ring"></i>
+          <span>Support</span>
+        </li>
+        <li (click)="logout()" data-label="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+      <div class="kanban-container">
+        <!-- Search Bar -->
+        <input
+          type="text"
+          class="task-search-bar"
+          placeholder="Search tasks..."
+          [ngModel]="searchQuery"
+          (ngModelChange)="onSearchQueryChange($event)"
+        />
+
+        <!-- Kanban Boards -->
+        <div class="kanban-boards">
+          <!-- To Do Column -->
+          <div class="kanban-board">
+            <div class="board-header todo">
+              <h2>To Do</h2>
+              <button class="add-btn" (click)="openAddTaskDialog()">+</button>
+            </div>
+            <div class="board-content" id="todo" cdkDropList (cdkDropListDropped)="drop($event)" [cdkDropListData]="todoTasks">
+              <div *ngFor="let task of getFilteredTasks(todoTasks); let i = index" cdkDrag [cdkDragData]="task">
+                <div class="task-card" [ngClass]="getTaskCardClass(task)">
+                  <div class="task-header">
+                    <span class="priority-dot"></span>
+                    <img class="user-avatar" src="https://via.placeholder.com/25" alt="Assignee Avatar" />
+                  </div>
+                  <h3>{{ task.title }}</h3>
+                  <p>{{ task.description }}</p>
+                  <p>Due: {{ task.dueDate }}</p>
+                  <p>Priority: {{ task.priority }}</p>
+                  <p>Assignee: {{ task.assignee }}</p>
+                  <div class="variant-tag">{{ task.variant || 'No Variant' }}</div>
+                  <div class="task-actions">
+                    <button (click)="editTask(task, 'todo', i)">Edit</button>
+                    <button (click)="deleteTask('todo', i)">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- In Progress Column -->
+          <div class="kanban-board">
+            <div class="board-header in-progress">
+              <h2>In Progress</h2>
+              <button class="add-btn" (click)="openAddTaskDialog()">+</button>
+            </div>
+            <div class="board-content" id="inProgress" cdkDropList (cdkDropListDropped)="drop($event)" [cdkDropListData]="inProgressTasks">
+              <div *ngFor="let task of getFilteredTasks(inProgressTasks); let i = index" cdkDrag [cdkDragData]="task">
+                <div class="task-card" [ngClass]="getTaskCardClass(task)">
+                  <div class="task-header">
+                    <span class="priority-dot"></span>
+                    <img class="user-avatar" src="https://via.placeholder.com/25" alt="Assignee Avatar" />
+                  </div>
+                  <h3>{{ task.title }}</h3>
+                  <p>{{ task.description }}</p>
+                  <p>Due: {{ task.dueDate }}</p>
+                  <p>Priority: {{ task.priority }}</p>
+                  <p>Assignee: {{ task.assignee }}</p>
+                  <div class="variant-tag">{{ task.variant || 'No Variant' }}</div>
+                  <div class="task-actions">
+                    <button (click)="editTask(task, 'inProgress', i)">Edit</button>
+                    <button (click)="deleteTask('inProgress', i)">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Completed Column -->
+          <div class="kanban-board">
+            <div class="board-header completed">
+              <h2>Completed</h2>
+              <button class="add-btn" (click)="openAddTaskDialog()">+</button>
+            </div>
+            <div class="board-content" id="completed" cdkDropList (cdkDropListDropped)="drop($event)" [cdkDropListData]="completedTasks">
+              <div *ngFor="let task of getFilteredTasks(completedTasks); let i = index" cdkDrag [cdkDragData]="task">
+                <div class="task-card" [ngClass]="getTaskCardClass(task)">
+                  <div class="task-header">
+                    <span class="priority-dot"></span>
+                    <img class="user-avatar" src="https://via.placeholder.com/25" alt="Assignee Avatar" />
+                  </div>
+                  <h3>{{ task.title }}</h3>
+                  <p>{{ task.description }}</p>
+                  <p>Due: {{ task.dueDate }}</p>
+                  <p>Priority: {{ task.priority }}</p>
+                  <p>Assignee: {{ task.assignee }}</p>
+                  <div class="variant-tag">{{ task.variant || 'No Variant' }}</div>
+                  <div class="task-actions">
+                    <button (click)="editTask(task, 'completed', i)">Edit</button>
+                    <button (click)="deleteTask('completed', i)">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="right-sidebar">
+      <!-- Calendar Container -->
+      <div class="calendar-container">
+        <div class="card">
+          <div class="p-datepicker">
+            <div class="p-datepicker-header">
+              <button class="p-datepicker-prev" (click)="prevMonth()">◄</button>
+              <span class="p-datepicker-title">
+                {{ currentMonth | date: 'MMMM yyyy' }}
+              </span>
+              <button class="p-datepicker-next" (click)="nextMonth()">►</button>
+            </div>
+            <table class="p-datepicker-calendar">
+              <thead>
+                <tr>
+                  <th>Sun</th>
+                  <th>Mon</th>
+                  <th>Tue</th>
+                  <th>Wed</th>
+                  <th>Thu</th>
+                  <th>Fri</th>
+                  <th>Sat</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let week of weeks">
+                  <td *ngFor="let day of week">
+                    <span
+                      [ngClass]="{
+                        'p-highlight': day.isToday,
+                        'p-disabled': !day.isCurrentMonth
+                      }"
+                    >
+                      {{ day.date || '' }}
+                      <div *ngIf="day.events.length > 0" class="event-dot"></div>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doughnut Chart -->
+      <div class="chart-container">
+        <div class="card flex justify-center">
+          <p-chart type="doughnut" [data]="chartData" [options]="chartOptions" class="w-full"></p-chart>
+          <div class="chart-legend">
+            <div class="legend-item todo">
+              <span class="legend-color"></span>
+              <span>To Do</span>
+            </div>
+            <div class="legend-item in-progress">
+              <span class="legend-color"></span>
+              <span>In Progress</span>
+            </div>
+            <div class="legend-item completed">
+              <span class="legend-color"></span>
+              <span>Completed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Dialog -->
+  <div class="task-dialog" *ngIf="isDialogVisible">
+    <div class="task-dialog-content">
+      <h3>{{ isEditing ? 'Edit Task' : 'Add Task' }}</h3>
+      <form (ngSubmit)="submitTask()">
+        <label>Title:</label>
+        <input type="text" [(ngModel)]="currentTask!.title" name="title" required />
+        <label>Description:</label>
+        <textarea [(ngModel)]="currentTask!.description" name="description"></textarea>
+        <label>Due Date:</label>
+        <input type="date" [(ngModel)]="currentTask!.dueDate" name="dueDate" />
+        <label>Priority:</label>
+        <select [(ngModel)]="currentTask!.priority" name="priority">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+        <label>Assignee:</label>
+        <select [(ngModel)]="currentTask!.assignee" name="assignee">
+          <option *ngFor="let user of users" [value]="user.name">{{ user.name }}</option>
+        </select>
+        <label>Status:</label>
+        <select [(ngModel)]="currentTask!.status" name="status">
+          <option value="To Do">To Do</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+        <label>Variant:</label>
+        <input type="text" [(ngModel)]="currentTask!.variant" name="variant" />
+        <div class="dialog-actions">
+          <button type="submit">{{ isEditing ? 'Update' : 'Add' }}</button>
+          <button type="button" (click)="closeTaskDialog()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+TS...................................................................................................................................
+
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { CdkDragDrop, transferArrayItem, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ChartModule } from 'primeng/chart';
+
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  priority: 'low' | 'medium' | 'high';
+  assignee: string;
+  variant: string;
+  status: 'To Do' | 'In Progress' | 'Completed';
+}
+
+interface CalendarDay {
+  date: number | null;
+  isToday: boolean;
+  isCurrentMonth: boolean;
+  events: Task[];
+}
+
+@Component({
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
+  standalone: false,
+
+})
+export class DashboardComponent {
+  isSidebarOpen: boolean = false;
+
+  onSidebarToggle(): void {
+    this.isSidebarOpen = !this.isSidebarOpen; // Toggle the state
+    console.log('Sidebar toggled:', this.isSidebarOpen); // Debugging log
+}
+  isSidebarCollapsed = false;
+  isDialogVisible = false;
+  isTaskListVisible = false;
+  isEditing = false;
+  currentTaskIndex: number | null = null;
+  currentTaskList: string | null = null;
+  searchQuery: string = '';
+  selectedPriority: 'low' | 'medium' | 'high' | 'all' = 'all';
+  date: Date = new Date();
+  todoTasks: Task[] = [];
+  inProgressTasks: Task[] = [];
+  completedTasks: Task[] = [];
+  users: { id: string; name: string }[] = [
+    { id: '1', name: 'Rasul Ahmed Khan' },
+    { id: '2', name: 'Jane Smith' },
+    { id: '3', name: 'Alice Johnson' },
+    { id: '4', name: 'Bob Brown' },
+  ];
+  currentTask: Task | null = null;
+  currentMonth: Date = new Date();
+  calendarDates: CalendarDay[] = [];
+  weeks: CalendarDay[][] = [];
+
+  // Doughnut chart properties
+  chartData: any;
+  chartOptions: any;
+
+  constructor(private router: Router, private cdr: ChangeDetectorRef) {
+    this.generateCalendarDates();
+    this.initializeSampleTasks(); // Add some sample tasks for demo
+  }
+
+  ngOnInit() {
+    this.initChart();
+  }
+
+  initializeSampleTasks() {
+    this.todoTasks = [
+
+    ];
+    this.inProgressTasks = [];
+    this.completedTasks = [];
+    this.generateCalendarDates();
+    this.initChart(); // Initialize chart after adding sample tasks
+  }
+
+  initChart() {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColor = documentStyle.getPropertyValue('--text-color') || '#000000';
+
+    // Calculate the number of tasks in each status
+    const totalTasks = this.getAllTasks().length;
+    const todoCount = this.todoTasks.length;
+    const inProgressCount = this.inProgressTasks.length;
+    const completedCount = this.completedTasks.length;
+
+    // Calculate percentages
+    const todoPercentage = totalTasks ? (todoCount / totalTasks) * 100 : 0;
+    const inProgressPercentage = totalTasks ? (inProgressCount / totalTasks) * 100 : 0;
+    const completedPercentage = totalTasks ? (completedCount / totalTasks) * 100 : 0;
+
+    this.chartData = {
+      labels: ['To Do', 'In Progress', 'Completed'],
+      datasets: [
+        {
+          data: [todoPercentage, inProgressPercentage, completedPercentage],
+          backgroundColor: [
+            documentStyle.getPropertyValue('--red-500') || '#ff0000', // Red for To Do
+            documentStyle.getPropertyValue('--yellow-500') || '#ffeb3b', // Yellow for In Progress
+            documentStyle.getPropertyValue('--green-500') || '#4caf50', // Green for Completed
+          ],
+          hoverBackgroundColor: [
+            documentStyle.getPropertyValue('--red-400') || '#ff3333',
+            documentStyle.getPropertyValue('--yellow-400') || '#ffee58',
+            documentStyle.getPropertyValue('--green-400') || '#66bb6a',
+          ],
+        },
+      ],
+    };
+
+    this.chartOptions = {
+      cutout: '60%',
+      plugins: {
+        legend: {
+          labels: {
+            color: textColor,
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: (context: any) => {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              return `${label}: ${value.toFixed(2)}%`;
+            },
+          },
+        },
+      },
+    };
+
+    this.cdr.markForCheck();
+  }
+
+  // Update chart whenever tasks change
+  updateChart() {
+    this.initChart();
+  }
+
+  toggleSidebar() {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
+
+  toggleTaskList() {
+    this.isTaskListVisible = !this.isTaskListVisible;
+  }
+
+  getAllTasks(): Task[] {
+    return [...this.todoTasks, ...this.inProgressTasks, ...this.completedTasks];
+  }
+
+  openAddTaskDialog() {
+    this.isDialogVisible = true;
+    this.isEditing = false;
+    this.currentTaskIndex = null;
+    this.currentTaskList = null;
+    this.currentTask = this.createNewTask();
+  }
+
+  createNewTask(): Task {
+    return {
+      id: this.generateTaskId(),
+      title: '',
+      description: '',
+      dueDate: '',
+      priority: 'low',
+      assignee: '',
+      variant: '',
+      status: 'To Do',
+    };
+  }
+
+  generateTaskId(): string {
+    return Math.random().toString(36).substr(2, 9);
+  }
+
+  editTask(task: Task, list: string, index: number) {
+    this.isDialogVisible = true;
+    this.isEditing = true;
+    this.currentTaskIndex = index;
+    this.currentTaskList = list;
+    this.currentTask = { ...task };
+  }
+
+  deleteTask(list: string, index: number) {
+    if (list === 'todo') this.todoTasks.splice(index, 1);
+    else if (list === 'inProgress') this.inProgressTasks.splice(index, 1);
+    else if (list === 'completed') this.completedTasks.splice(index, 1);
+    this.generateCalendarDates();
+    this.updateChart(); // Update chart after deleting a task
+    this.cdr.detectChanges();
+  }
+
+  submitTask() {
+    if (this.currentTask) {
+      if (this.isEditing && this.currentTaskIndex !== null && this.currentTaskList !== null) {
+        this.updateTaskInList(this.currentTask);
+      } else {
+        this.addTaskToList(this.currentTask);
+      }
+      this.isDialogVisible = false;
+      this.currentTaskList = null;
+      this.generateCalendarDates();
+      this.updateChart(); // Update chart after adding/updating a task
+      this.cdr.detectChanges();
+    }
+  }
+
+  updateTaskInList(task: Task) {
+    if (this.currentTaskIndex === null || this.currentTaskList === null) return;
+
+    let originalList: Task[];
+    switch (this.currentTaskList) {
+      case 'todo':
+        originalList = this.todoTasks;
+        break;
+      case 'inProgress':
+        originalList = this.inProgressTasks;
+        break;
+      case 'completed':
+        originalList = this.completedTasks;
+        break;
+      default:
+        return;
+    }
+
+    originalList.splice(this.currentTaskIndex, 1);
+
+    if (task.status === 'To Do') {
+      this.todoTasks.push({ ...task });
+    } else if (task.status === 'In Progress') {
+      this.inProgressTasks.push({ ...task });
+    } else if (task.status === 'Completed') {
+      this.completedTasks.push({ ...task });
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  addTaskToList(task: Task) {
+    if (task.status === 'To Do') this.todoTasks.push(task);
+    else if (task.status === 'In Progress') this.inProgressTasks.push(task);
+    else if (task.status === 'Completed') this.completedTasks.push(task);
+    this.cdr.detectChanges();
+  }
+
+  closeTaskDialog() {
+    this.isDialogVisible = false;
+    this.currentTaskList = null;
+  }
+
+  drop(event: CdkDragDrop<Task[]>) {
+    const targetList = event.container.id;
+    const movedTask = event.item.data;
+
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+
+      if (targetList === 'todo') {
+        movedTask.status = 'To Do';
+        this.todoTasks[event.currentIndex] = { ...movedTask };
+      } else if (targetList === 'inProgress') {
+        movedTask.status = 'In Progress';
+        this.inProgressTasks[event.currentIndex] = { ...movedTask };
+      } else if (targetList === 'completed') {
+        movedTask.status = 'Completed';
+        this.completedTasks[event.currentIndex] = { ...movedTask };
+      }
+    }
+
+    this.generateCalendarDates();
+    this.updateChart(); // Update chart after moving a task
+    this.cdr.detectChanges();
+  }
+
+  getFilteredTasks(tasks: Task[]) {
+    return tasks.filter(task => {
+      return (
+        (this.selectedPriority === 'all' || task.priority === this.selectedPriority) &&
+        task.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    });
+  }
+
+  onSearchQueryChange(query: string) {
+    this.searchQuery = query;
+  }
+
+  onPriorityFilterChange(priority: 'low' | 'medium' | 'high' | 'all') {
+    this.selectedPriority = priority;
+  }
+
+  getTaskCardClass(task: Task): string {
+    const priority = task.priority?.toLowerCase().trim();
+    switch (priority) {
+      case 'high':
+        return 'high';
+      case 'medium':
+        return 'medium';
+      case 'low':
+        return 'low';
+      default:
+        return '';
+    }
+  }
+
+  logout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    this.router.navigate(['/auth/login']);
+  }
+
+  // Calendar Methods
+  prevMonth() {
+    const newMonth = new Date(this.currentMonth);
+    newMonth.setMonth(newMonth.getMonth() - 1);
+    this.currentMonth = newMonth;
+    this.generateCalendarDates();
+    this.cdr.detectChanges();
+  }
+
+  nextMonth() {
+    const newMonth = new Date(this.currentMonth);
+    newMonth.setMonth(newMonth.getMonth() + 1);
+    this.currentMonth = newMonth;
+    this.generateCalendarDates();
+    this.cdr.detectChanges();
+  }
+
+  generateCalendarDates() {
+    const year = this.currentMonth.getFullYear();
+    const month = this.currentMonth.getMonth();
+    const today = new Date();
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const startingDay = firstDayOfMonth.getDay();
+    const daysInMonth = lastDayOfMonth.getDate();
+    const allTasks = this.getAllTasks();
+
+    this.calendarDates = [];
+    this.weeks = [];
+
+    for (let i = 0; i < startingDay; i++) {
+      this.calendarDates.push({
+        date: null,
+        isToday: false,
+        isCurrentMonth: false,
+        events: [],
+      });
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const currentDate = new Date(year, month, day);
+      const isToday =
+        currentDate.getDate() === today.getDate() &&
+        currentDate.getMonth() === today.getMonth() &&
+        currentDate.getFullYear() === today.getFullYear();
+
+      const events = allTasks.filter(task => {
+        if (!task.dueDate) return false;
+        const dueDate = new Date(task.dueDate);
+        return (
+          dueDate.getDate() === day &&
+          dueDate.getMonth() === month &&
+          dueDate.getFullYear() === year
+        );
+      });
+
+      this.calendarDates.push({
+        date: day,
+        isToday,
+        isCurrentMonth: true,
+        events,
+      });
+    }
+
+    const remainingDays = (7 - (this.calendarDates.length % 7)) % 7;
+    for (let i = 0; i < remainingDays; i++) {
+      this.calendarDates.push({
+        date: null,
+        isToday: false,
+        isCurrentMonth: false,
+        events: [],
+      });
+    }
+
+    for (let i = 0; i < this.calendarDates.length; i += 7) {
+      this.weeks.push(this.calendarDates.slice(i, i + 7));
+    }
+  }
+
+  getMonthName(): string {
+    return this.currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' });
+  }
+}
+
+
+
+
+
+SCSS.............................................................................................................................
+
+// Variables for a compact layout
+$primary-bg: linear-gradient(135deg, #1e3c72, #2a5298);
+$header-bg: #ffffff;
+$sidebar-bg: #2c3e50;
+$sidebar-text: #ecf0f1;
+$red-bar: #e74c3c;
+$yellow-bar: #f1c40f;
+$green-bar: #2ecc71;
+$task-card-bg: #ffffff;
+$text-color: #333;
+$sidebar-width: 200px;
+$sidebar-collapsed-width: 50px;
+$header-height: 60px;
+$calendar-date-bg: #f9f9f9;
+$calendar-selected-bg: #3498db;
+$calendar-event-bg: #e74c3c;
+$calendar-width: 250px;
+$calendar-height: 350px;
+$chart-height:100px;
+$spacing: 15px;
+
+// Reset and global styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: $primary-bg;
+  color: $text-color;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// Dashboard Container
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 700;
+
+  // Header
+  .header {
+    width: 100%;
+    height: $header-height;
+    background: $header-bg;
+    padding: 0 $spacing;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .toggle-sidebar {
+        background: none;
+        border: none;
+        font-size: 1.2em;
+        cursor: pointer;
+        color: $text-color;
+        transition: color 0.3s;
+
+        &:hover {
+          color: $yellow-bar;
+        }
+      }
+
+      h1 {
+        color: black;
+        font-size: 1.4em;
+        font-weight: 600;
+      }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .user-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 2px solid $yellow-bar;
+        }
+
+        span {
+          color: $text-color;
+          font-size: 0.9em;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  .main-content {
+    display: flex;
+    background: $primary-bg;
+    margin-top: $header-height;
+    height: calc(100vh - #{$header-height});
+    padding: $spacing;
+    gap: $spacing;
+
+    // Sidebar
+    .sidebar {
+      width: $sidebar-width;
+      background: $sidebar-bg;
+      padding: $spacing 8px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: width 0.3s ease, padding 0.3s ease;
+      flex-shrink: 0;
+
+      &.collapsed {
+        width: $sidebar-collapsed-width;
+        padding: $spacing 4px;
+
+        span {
+          display: none;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        i {
+          margin-right: 0;
+          margin: 0 auto;
+        }
+
+        ul li {
+          justify-content: center;
+          padding: 10px 0;
+
+          &:hover::after {
+            content: attr(data-label);
+            position: absolute;
+            left: 100%;
+            margin-left: 8px;
+            background: $sidebar-bg;
+            color: $sidebar-text;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          }
+        }
+      }
+
+      ul {
+        list-style: none;
+        flex: 1;
+
+        li {
+          background-color: $yellow-bar;
+          margin-bottom: 10px;
+          padding: 10px;
+          font-size: 1em;
+          color: $text-color;
+          cursor: pointer;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: background 0.3s ease, transform 0.2s;
+
+          i {
+            font-size: 1.1em;
+          }
+
+          span {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+          }
+
+          &.active {
+            background: darken($yellow-bar, 10%);
+            transform: scale(1.02);
+          }
+
+          &:hover {
+            background: darken($yellow-bar, 5%);
+          }
+        }
+      }
+    }
+
+    // Content Wrapper
+    .content-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+
+      .kanban-container {
+        display: flex;
+        flex-direction: column; // Stack search bar and boards vertically
+        gap: 15px; // Reduced gap for compactness
+        overflow-x: auto;
+        flex: 1;
+
+        .task-search-bar {
+          padding: 8px 15px;
+          border: 1px solid #ddd;
+          border-radius: 20px;
+          font-size: 0.9em;
+          width: 100%;
+          max-width: 500px;
+          margin: 0 auto; // Centered
+          background: $header-bg;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          transition: border-color 0.3s, box-shadow 0.3s;
+
+          &:focus {
+            outline: none;
+            border-color: $yellow-bar;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          }
+        }
+
+        .kanban-boards {
+          display: flex;
+          justify-content: space-between;
+          gap: 20px; // Reduced from 30px for smaller layout
+          overflow-x: auto;
+          flex: 1;
+        }
+
+        .kanban-board {
+          flex: 1;
+          max-width: 700px; // Reduced from 250px for smaller boards
+          background: $task-card-bg;
+          border-radius: 6px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+          .board-header {
+            padding: 8px; // Reduced from 10px
+            color: #fff;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            &.todo {
+              background: $red-bar;
+            }
+            &.in-progress {
+              background: $yellow-bar;
+            }
+            &.completed {
+              background: $green-bar;
+            }
+
+            h2 {
+              font-size: 1em; // Reduced from 1.1em
+              margin: 0;
+              font-weight: 500;
+            }
+
+            .add-btn {
+              background: rgba(255, 255, 255, 0.2);
+              border: none;
+              border-radius: 50%;
+              width: 20px; // Reduced from 24px
+              height: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              color: #fff;
+              font-size: 1em; // Reduced from 1.1em
+              transition: background 0.3s ease;
+
+              &:hover {
+                background: rgba(255, 255, 255, 0.4);
+              }
+            }
+          }
+
+          .board-content {
+            padding: 10px; // Reduced from 12px
+            overflow-y: auto;
+            min-height: 120px; // Reduced from 150px
+            max-height: calc(100vh - #{$header-height} - 120px); // Adjusted for search bar above
+            background: #f9f9f9;
+
+            &::-webkit-scrollbar {
+              width: 6px;
+            }
+
+            &::-webkit-scrollbar-track {
+              background: #f1f1f1;
+              border-radius: 3px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+              background: $yellow-bar;
+              border-radius: 3px;
+            }
+
+            &::-webkit-scrollbar-thumb:hover {
+              background: darken($yellow-bar, 10%);
+            }
+
+            .task-card {
+              border-radius: 4px;
+              padding: 8px; // Reduced from 10px
+              margin-bottom: 6px; // Reduced from 8px
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+              background: $task-card-bg;
+              transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+              &.high {
+                background-color: #f39191;
+                border-left: 3px solid $red-bar;
+                .priority-dot {
+                  background-color: $red-bar;
+                }
+              }
+
+              &.medium {
+                background-color: #fff3e6;
+                border-left: 3px solid $yellow-bar;
+                .priority-dot {
+                  background-color: $yellow-bar;
+                }
+              }
+
+              &.low {
+                background-color: #b6f7a2;
+                border-left: 3px solid $green-bar;
+                .priority-dot {
+                  background-color: $green-bar;
+                }
+              }
+
+              &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+              }
+
+              .task-header {
+                display: flex;
+                align-items: center;
+                gap: 5px; // Reduced from 6px
+                margin-bottom: 5px; // Reduced from 6px
+
+                .priority-dot {
+                  width: 6px; // Reduced from 8px
+                  height: 6px;
+                  border-radius: 50%;
+                }
+
+                .user-avatar {
+                  width: 18px; // Reduced from 20px
+                  height: 18px;
+                  border-radius: 50%;
+                  border: 1px solid $yellow-bar;
+                }
+              }
+
+              h3 {
+                font-size: 0.85em; // Reduced from 0.9em
+                color: $text-color;
+                margin: 0 0 3px; // Reduced from 4px
+                font-weight: 500;
+              }
+
+              p {
+                font-size: 0.7em; // Reduced from 0.75em
+                color: #666;
+                margin: 1px 0;
+              }
+
+              .variant-tag {
+                font-size: 0.65em; // Reduced from 0.7em
+                color: #888;
+                background: #f0f0f0;
+                padding: 1px 3px; // Reduced from 1px 4px
+                border-radius: 2px;
+                display: inline-block;
+                margin-top: 3px; // Reduced from 4px
+              }
+
+              .task-actions {
+                margin-top: 5px; // Reduced from 6px
+                display: flex;
+                gap: 3px; // Reduced from 4px
+
+                button {
+                  padding: 2px 6px; // Reduced from 3px 8px
+                  font-size: 0.7em; // Reduced from 0.75em
+                  border: none;
+                  border-radius: 2px;
+                  cursor: pointer;
+                  background-color: $green-bar;
+                  color: #fff;
+                  transition: background 0.3s ease;
+
+                  &:hover {
+                    background: $yellow-bar;
+                    color: $text-color;
+                  }
+
+                  &:last-child {
+                    background: $red-bar;
+
+                    &:hover {
+                      background: darken($red-bar, 10%);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Right Sidebar
+    .right-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing;
+      width: $calendar-width;
+      flex-shrink: 0;
+      padding-top: 50px;
+
+      .calendar-container {
+        width: $calendar-width;
+        height: $calendar-height;
+        align-self: flex-start;
+
+        .card {
+          background: $header-bg;
+          border-radius: 6px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+
+          .p-datepicker {
+            width: 100%;
+            height: 100%;
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+
+            .p-datepicker-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 6px 8px;
+              border-bottom: 1px solid #ddd;
+              flex-shrink: 0;
+
+              .p-datepicker-prev,
+              .p-datepicker-next {
+                background: none;
+                border: none;
+                font-size: 1.1em;
+                color: $text-color;
+                cursor: pointer;
+                transition: color 0.3s;
+
+                &:hover {
+                  color: $yellow-bar;
+                }
+              }
+
+              .p-datepicker-title {
+                font-size: 1em;
+                font-weight: 500;
+                color: $text-color;
+              }
+            }
+
+            .p-datepicker-calendar {
+              width: 100%;
+              flex: 1;
+              border-collapse: collapse;
+              margin-top: 8px;
+
+              thead {
+                th {
+                  font-size: 0.75em;
+                  color: #666;
+                  padding: 6px;
+                  text-align: center;
+                  border-bottom: 1px solid #ddd;
+                }
+              }
+
+              tbody {
+                tr {
+                  td {
+                    padding: 3px;
+                    text-align: center;
+                    position: relative;
+
+                    span {
+                      display: inline-block;
+                      width: 28px;
+                      height: 28px;
+                      line-height: 28px;
+                      font-size: 0.8em;
+                      color: $text-color;
+                      border-radius: 50%;
+                      transition: background 0.3s;
+
+                      &.p-highlight {
+                        background: $calendar-selected-bg;
+                        color: #fff;
+                      }
+
+                      &.p-disabled {
+                        color: #999;
+                        background: transparent;
+                        cursor: not-allowed;
+                      }
+
+                      &:hover:not(.p-disabled) {
+                        background: lighten($calendar-selected-bg, 30%);
+                      }
+
+                      .event-dot {
+                        width: 5px;
+                        height: 5px;
+                        background: $calendar-event-bg;
+                        border-radius: 50%;
+                        position: absolute;
+                        bottom: 3px;
+                        right: 3px;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .chart-container {
+        padding: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .card {
+          width: 100%;
+          max-width: $calendar-width;
+          padding: 0.8rem;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          border-radius: 0.4rem;
+          background: $task-card-bg;
+          position: relative;
+          height:250px;
+
+          .chart-legend {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            display: flex;
+            gap: 10px;
+            font-size: 0.75em;
+
+            .legend-item {
+              display: flex;
+              align-items: center;
+              gap: 5px;
+
+              .legend-color {
+                width: 10px;
+                height: 10px;
+                border-radius: 2px;
+              }
+
+              &.todo .legend-color {
+                background: $red-bar;
+              }
+              &.in-progress .legend-color {
+                background: $yellow-bar;
+              }
+              &.completed .legend-color {
+                background: $green-bar;
+              }
+            }
+          }
+        }
+
+        p-chart {
+          display: block;
+          width: 100%;
+          height: 250px;
+          width:200;
+        }
+      }
+    }
+  }
+
+  // Task Dialog Modal
+  .task-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+
+    .task-dialog-content {
+      background: $task-card-bg;
+      padding: 20px;
+      border-radius: 6px;
+      width: 400px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 0.3s ease;
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      h3 {
+        font-size: 1.4em;
+        color: $text-color;
+        margin-bottom: 15px;
+        font-weight: 600;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        color: $text-color;
+        font-weight: 500;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 12px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        font-size: 0.9em;
+        transition: border-color 0.3s;
+
+        &:focus {
+          outline: none;
+          border-color: $yellow-bar;
+        }
+      }
+
+      textarea {
+        height: 80px;
+        resize: vertical;
+      }
+
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+
+        button {
+          padding: 8px 15px;
+          border: none;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 0.9em;
+          font-weight: 500;
+          transition: background 0.3s ease, transform 0.2s;
+
+          &:first-child {
+            background: $green-bar;
+            color: #fff;
+
+            &:hover {
+              background: darken($green-bar, 10%);
+              transform: translateY(-1px);
+            }
+          }
+
+          &:last-child {
+            background: $red-bar;
+            color: #fff;
+
+            &:hover {
+              background: darken($red-bar, 10%);
+              transform: translateY(-1px);
+            }
+          }
+        }
+      }
+    }
+  }
+}

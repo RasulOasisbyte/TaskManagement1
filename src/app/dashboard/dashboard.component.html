@@ -1,0 +1,250 @@
+
+
+
+
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <button class="toggle-sidebar" (click)="toggleSidebar()">☰</button>
+      <h1>Rasul Task Management Application</h1>
+    </div>
+    <div class="header-right">
+      <div class="user-profile">
+
+        <span>Rasul Ahmed Khan</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+
+  <div class="main-content">
+    <!-- Sidebar -->
+    <div class="sidebar" [ngClass]="{ 'collapsed': isSidebarCollapsed }">
+      <ul>
+        <li [ngClass]="{ 'active': true }" data-label="Dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </li>
+        <li data-label="Support">
+        <i class="fas fa-sign-out-alt"></i>
+        <a routerLink="/auth/support/dashboard">Support</a>
+        </li>
+
+        <li (click)="logout()" data-label="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </li>
+      </ul>
+    </div>
+
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+
+      <div class="kanban-container">
+        <!-- Search Bar -->
+        <input
+          type="text"
+          class="task-search-bar"
+          placeholder="Search tasks..."
+          [ngModel]="searchQuery"
+          (ngModelChange)="onSearchQueryChange($event)"
+        />
+
+        <!-- Kanban Boards -->
+        <div class="kanban-boards">
+          <!-- To Do Column -->
+          <div class="kanban-board">
+            <div class="board-header todo">
+              <h2>To Do</h2>
+                <button class="add-btn" (click)="openAddTaskDialog()">+</button>
+
+              </div>
+            <div class="board-content" id="todo" cdkDropList (cdkDropListDropped)="drop($event)" [cdkDropListData]="todoTasks">
+              <div *ngFor="let task of getFilteredTasks(todoTasks); let i = index" cdkDrag [cdkDragData]="task">
+                <div class="task-card" [ngClass]="getTaskCardClass(task)">
+                  <div class="task-header">
+                    <span class="priority-dot"></span>
+
+                  </div>
+                  <h3>{{ task.title }}</h3>
+                  <p>{{ task.description }}</p>
+                  <p>Due: {{ task.dueDate }}</p>
+                  <p>Priority: {{ task.priority }}</p>
+                  <p>Assignee: {{ task.assignee }}</p>
+                  <div class="variant-tag">{{ task.variant || 'No Variant' }}</div>
+                  <div class="task-actions">
+                    <button (click)="editTask(task, 'todo', i)">Edit</button>
+                    <button (click)="deleteTask('todo', i)">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- In Progress Column -->
+          <div class="kanban-board">
+            <div class="board-header in-progress">
+              <h2>In Progress</h2>
+              <button class="add-btn" (click)="openAddTaskDialog()">+</button>
+            </div>
+            <div class="board-content" id="inProgress" cdkDropList (cdkDropListDropped)="drop($event)" [cdkDropListData]="inProgressTasks">
+              <div *ngFor="let task of getFilteredTasks(inProgressTasks); let i = index" cdkDrag [cdkDragData]="task">
+                <div class="task-card" [ngClass]="getTaskCardClass(task)">
+                  <div class="task-header">
+                    <span class="priority-dot"></span>
+                  </div>
+                  <h3>{{ task.title }}</h3>
+                  <p>{{ task.description }}</p>
+                  <p>Due: {{ task.dueDate }}</p>
+                  <p>Priority: {{ task.priority }}</p>
+                  <p>Assignee: {{ task.assignee }}</p>
+                  <div class="variant-tag">{{ task.variant || 'No Variant' }}</div>
+                  <div class="task-actions">
+                    <button (click)="editTask(task, 'inProgress', i)">Edit</button>
+                    <button (click)="deleteTask('inProgress', i)">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Completed Column -->
+          <div class="kanban-board">
+            <div class="board-header completed">
+              <h2>Completed</h2>
+              <button class="add-btn" (click)="openAddTaskDialog()">+</button>
+            </div>
+            <div class="board-content" id="completed" cdkDropList (cdkDropListDropped)="drop($event)" [cdkDropListData]="completedTasks">
+              <div *ngFor="let task of getFilteredTasks(completedTasks); let i = index" cdkDrag [cdkDragData]="task">
+                <div class="task-card" [ngClass]="getTaskCardClass(task)">
+                  <div class="task-header">
+                    <span class="priority-dot"></span>
+                  </div>
+                  <h3>{{ task.title }}</h3>
+                  <p>{{ task.description }}</p>
+                  <p>Due: {{ task.dueDate }}</p>
+                  <p>Priority: {{ task.priority }}</p>
+                  <p>Assignee: {{ task.assignee }}</p>
+                  <div class="variant-tag">{{ task.variant || 'No Variant' }}</div>
+                  <div class="task-actions">
+                    <button (click)="editTask(task, 'completed', i)">Edit</button>
+                    <button (click)="deleteTask('completed', i)">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="right-sidebar">
+      <!-- Calendar Container -->
+      <div class="calendar-container">
+        <div class="card">
+          <div class="p-datepicker">
+            <div class="p-datepicker-header">
+              <button class="p-datepicker-prev" (click)="prevMonth()">◄</button>
+              <span class="p-datepicker-title">
+                {{ currentMonth | date: 'MMMM yyyy' }}
+              </span>
+              <button class="p-datepicker-next" (click)="nextMonth()">►</button>
+            </div>
+            <table class="p-datepicker-calendar">
+              <thead>
+                <tr>
+                  <th>Sun</th>
+                  <th>Mon</th>
+                  <th>Tue</th>
+                  <th>Wed</th>
+                  <th>Thu</th>
+                  <th>Fri</th>
+                  <th>Sat</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let week of weeks">
+                  <td *ngFor="let day of week">
+                    <span
+                      [ngClass]="{
+                        'p-highlight': day.isToday,
+                        'p-disabled': !day.isCurrentMonth
+                      }"
+                    >
+                      {{ day.date || '' }}
+                      <div *ngIf="day.events.length > 0" class="event-dot"></div>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doughnut Chart -->
+      <div class="chart-container">
+        <div class="card flex justify-center">
+          <p-chart type="doughnut" [data]="chartData" [options]="chartOptions" class="w-full"></p-chart>
+          <div class="chart-legend">
+            <div class="legend-item todo">
+              <span class="legend-color"></span>
+              <span>To Do</span>
+            </div>
+            <div class="legend-item in-progress">
+              <span class="legend-color"></span>
+              <span>In Progress</span>
+            </div>
+            <div class="legend-item completed">
+              <span class="legend-color"></span>
+              <span>Completed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Dialog -->
+  <div class="task-dialog" *ngIf="isDialogVisible">
+    <div class="task-dialog-content">
+      <h3>{{ isEditing ? 'Edit Task' : 'Add Task' }}</h3>
+      <form (ngSubmit)="submitTask()">
+        <label>Title:</label>
+        <input type="text" [(ngModel)]="currentTask!.title" name="title" required />
+        <label>Description:</label>
+        <textarea [(ngModel)]="currentTask!.description" name="description"></textarea>
+        <label>Due Date:</label>
+        <input type="date" [(ngModel)]="currentTask!.dueDate" name="dueDate" />
+        <label>Priority:</label>
+        <select [(ngModel)]="currentTask!.priority" name="priority">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+        <label>Assignee:</label>
+        <select [(ngModel)]="currentTask!.assignee" name="assignee">
+          <option *ngFor="let user of users" [value]="user.name">{{ user.name }}</option>
+        </select>
+        <label>Status:</label>
+        <select [(ngModel)]="currentTask!.status" name="status">
+          <option value="To Do">To Do</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+        <label>Variant:</label>
+        <input type="text" [(ngModel)]="currentTask!.variant" name="variant" />
+        <div class="dialog-actions">
+          <button type="submit">{{ isEditing ? 'Update' : 'Add' }}</button>
+          <button type="button" (click)="closeTaskDialog()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+

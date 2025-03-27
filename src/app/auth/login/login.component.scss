@@ -1,0 +1,225 @@
+/* Base container with gradient background */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(45deg, #1a1b41 0%, #4e4feb 100%);
+  padding: 1rem;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* Form wrapper with fade-in animation */
+.login-form-wrapper {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 450px;
+
+  @media (max-width: 480px) {
+    padding: 1.5rem;
+    max-width: 90%;
+  }
+}
+
+/* Branding section */
+.branding {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 2rem;
+    color: #1a1b41;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+
+    @media (max-width: 480px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  p {
+    color: #666;
+    font-size: 1rem;
+
+    @media (max-width: 480px) {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* Tab content */
+.tab-content {
+  padding: 1rem 0;
+
+  h2 {
+    font-size: 1.5rem;
+    color: #1a1b41;
+    text-align: center;
+    margin-bottom: 1.5rem;
+
+    @media (max-width: 480px) {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+/* Subtitle links with hover effect */
+.subtitle {
+  text-align: center;
+  margin-bottom: 1.5rem;
+
+  a {
+    color: #4e4feb;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #1a1b41;
+    }
+  }
+}
+
+/* Input fields with validation and focus effects */
+.input-wrapper {
+  margin-bottom: 1.5rem;
+
+  .p-float-label {
+    width: 100%;
+
+    input {
+      width: 100%;
+      border-radius: 6px;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      transition: border-color 0.3s;
+
+      &:focus {
+        border-color: #4e4feb;
+        outline: none;
+      }
+
+      &.ng-invalid.ng-touched {
+        border-color: #ff4444;
+      }
+    }
+
+    label {
+      color: #666;
+      transition: all 0.3s;
+    }
+  }
+
+  .p-error {
+    color: #ff4444;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: block;
+  }
+}
+
+/* Form options with hover effects */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+
+  .remember-me {
+    display: flex;
+    align-items: center;
+
+    .p-checkbox {
+      margin-right: 0.5rem;
+
+      .p-checkbox-box {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        transition: background 0.3s, border-color 0.3s;
+
+        &.p-highlight {
+          background: #4e4feb;
+          border-color: #4e4feb;
+        }
+      }
+    }
+
+    label {
+      color: #666;
+    }
+  }
+
+  .forgot-password a {
+    color: #4e4feb;
+    text-decoration: none;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #1a1b41;
+    }
+  }
+}
+
+/* Primary button with hover and loading effects */
+.primary-button {
+  width: 100%;
+  background: #4e4feb;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 6px;
+  transition: background 0.3s;
+  color: white;
+  font-weight: 500;
+
+  &:hover:not(:disabled) {
+    background: #1a1b41;
+  }
+
+  &:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+  }
+
+  &.loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  0% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+/* PrimeNG overrides for consistency */
+::ng-deep .p-component,
+::ng-deep .p-inputtext {
+  box-sizing: border-box;
+}
